@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*.part
+*.tmp
+.vscode/
+.idea/
+.claude/

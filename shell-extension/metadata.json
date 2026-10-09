@@ -1,0 +1,7 @@
+{
+  "uuid": "music-top-bar@local.koen",
+  "name": "Music — Top Bar",
+  "description": "What Music is playing, in the top bar: cover, title, playback controls and the timeline. Only shown while Music runs.",
+  "shell-version": ["46", "47", "48", "49", "50"],
+  "url": ""
+}

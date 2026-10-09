@@ -1,0 +1,10 @@
+.music-panel { spacing: 14px; padding: 4px 2px; width: 356px; }
+.music-panel-cover { width: 116px; height: 116px; border-radius: 10px; background-size: cover; background-color: rgba(128, 128, 128, 0.3); }
+.music-panel-side { spacing: 2px; }
+.music-panel-title { font-weight: bold; font-size: 1.05em; }
+.music-panel-artist { font-size: 0.9em; opacity: 0.65; }
+.music-panel-controls { spacing: 16px; margin-top: 8px; margin-bottom: 4px; }
+.music-panel-button { border-radius: 99px; padding: 8px; }
+.music-panel-button:hover, .music-panel-button:focus { background-color: rgba(128, 128, 128, 0.25); }
+.music-panel-button:insensitive { opacity: 0.4; }
+.music-panel-time { font-size: 0.8em; opacity: 0.65; font-feature-settings: "tnum"; }

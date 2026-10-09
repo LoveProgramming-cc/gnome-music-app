@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=local.koen.Music
+Exec="@MUSIC@" --gapplication-service

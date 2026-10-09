@@ -1,0 +1,22 @@
+[Desktop Entry]
+Type=Application
+Name=Music
+Name[zh_CN]=音乐
+Name[zh_TW]=音樂
+Name[ja]=ミュージック
+Name[ko]=음악
+Name[ar]=الموسيقى
+GenericName=Music Player
+GenericName[zh_CN]=音乐播放器
+Comment=Play and organise your own music library
+Comment[zh_CN]=播放并整理你自己的音乐资料库
+Comment[ja]=自分のミュージックライブラリを再生・整理
+Comment[ko]=나만의 음악 보관함을 재생하고 정리
+Comment[ar]=شغّل مكتبتك الموسيقية ونظّمها
+Exec="@MUSIC@" %U
+Icon=local.koen.Music
+Terminal=false
+StartupNotify=true
+Categories=GNOME;GTK;AudioVideo;Audio;Player;
+Keywords=music;player;playlist;library;audio;song;音乐;播放器;歌单;
+MimeType=x-scheme-handler/music;audio/mpeg;audio/mp4;audio/aac;audio/flac;audio/x-flac;audio/ogg;audio/x-vorbis+ogg;audio/x-opus+ogg;audio/opus;audio/wav;audio/x-wav;
