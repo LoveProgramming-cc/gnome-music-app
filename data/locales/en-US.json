@@ -198,5 +198,14 @@
   "notEnoughSpace": "There is not enough free space there.",
   "libraryInside": "Choose a folder outside the current library.",
   "libraryMissing": "The library folder “{name}” was not found (is its drive connected?). An empty library in the default place is used for now.",
-  "libraryFolderName": "Music Library"
+  "libraryFolderName": "Music Library",
+  "exportLibrary": "Export Library…",
+  "importLibrary": "Import Library…",
+  "backup": "Whole library",
+  "backupHint": "Everything — songs, videos, covers, subtitles, playlists and folders — as one file, to keep or to move to another computer. Importing adds what is not here yet.",
+  "libraryImported": "Imported {songs} songs and {lists} playlists.",
+  "libraryNothingNew": "Everything in that file is already in the library.",
+  "libraryArchiveInvalid": "That file is not a library export.",
+  "libraryExportName": "Music Library",
+  "export": "Export"
 }

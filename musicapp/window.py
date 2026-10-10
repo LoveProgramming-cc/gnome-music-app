@@ -70,6 +70,7 @@ class MusicWindow(Adw.ApplicationWindow):
         core = self.core
         entries = {
             'import-songs': self.import_songs, 'import-playlist': self.import_playlist, 'new-playlist': core.create_playlist, 'new-folder': core.create_folder,
+            'export-library': core.export_library, 'import-library': self.import_library,
             'export-playlist': lambda: core.current_playlist() and core.export_playlist(core.current_playlist()['id']),
             'toggle': core.toggle, 'next': core.next, 'previous': core.previous, 'shuffle': lambda: core.set_shuffle(not core.lib['shuffle']),
             'repeat': core.cycle_repeat, 'now-playing': self.toggle_now, 'queue': self.toggle_queue, 'search': lambda: self.pages.get_visible_child_name() == 'main' and self.content.focus_search(),
@@ -89,6 +90,11 @@ class MusicWindow(Adw.ApplicationWindow):
         file.append(T('newPlaylist', 'New Playlist'), 'win.new-playlist')
         file.append(T('menuNewFolder', 'New Playlist Folder'), 'win.new-folder')
         file.append(T('exportPlaylist', 'Export Playlist…'), 'win.export-playlist')
+        whole = Gio.Menu()
+        whole.append(T('exportLibrary', 'Export Library…'), 'win.export-library')
+        whole.append(T('importLibrary', 'Import Library…'), 'win.import-library')
+        menu.append_section(None, file)
+        file = whole
         menu.append_section(None, file)
         controls = Gio.Menu()
         for label, action in ((T('menuPlayPause', 'Play / Pause'), 'toggle'), (T('menuNext', 'Next'), 'next'), (T('menuPrevious', 'Previous'), 'previous'),
@@ -268,6 +274,13 @@ class MusicWindow(Adw.ApplicationWindow):
 
     def import_songs(self):
         self.pick_files('audio', True, self.core.add_paths)
+
+    def import_library(self):
+        self.pick_files('archive', False, lambda paths: self.core.import_library(paths[0]))
+
+    def settings_changed(self):
+        """The library brought its own settings along (appearance, accent, language)."""
+        self.get_application().apply_library_settings()
 
     def import_playlist(self):
         self.pick_files('archive', False, lambda paths: self.core.import_archive(paths[0]))

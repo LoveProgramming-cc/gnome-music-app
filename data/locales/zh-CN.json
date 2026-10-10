@@ -198,5 +198,14 @@
   "notEnoughSpace": "目标位置的可用空间不足。",
   "libraryInside": "请选择当前资料库之外的文件夹。",
   "libraryMissing": "找不到资料库文件夹“{name}”（它所在的磁盘连接了吗？）。暂时改用默认位置的资料库。",
-  "libraryFolderName": "音乐资料库"
+  "libraryFolderName": "音乐资料库",
+  "exportLibrary": "导出资料库…",
+  "importLibrary": "导入资料库…",
+  "backup": "整个资料库",
+  "backupHint": "把全部内容（歌曲、视频、封面、字幕、歌单和文件夹）导出为一个文件，用于备份或迁移到另一台电脑。导入时只添加这里还没有的内容。",
+  "libraryImported": "已导入 {songs} 首歌曲、{lists} 个歌单。",
+  "libraryNothingNew": "这个文件里的内容资料库中都已经有了。",
+  "libraryArchiveInvalid": "这个文件不是资料库导出文件。",
+  "libraryExportName": "音乐资料库",
+  "export": "导出"
 }

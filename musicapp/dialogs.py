@@ -228,6 +228,12 @@ def settings_dialog(window):
     place.add_suffix(show)
     place.add_suffix(change)
     storage.add(place)
+    whole = Adw.ActionRow(title=T('backup', 'Whole library'), subtitle=T('backupHint', 'Everything as one file, to keep or to move to another computer.'))
+    for label, action in ((T('export', 'Export'), core.export_library), (T('import', 'Import'), window.import_library)):
+        button = Gtk.Button(label=label, valign=Gtk.Align.CENTER)
+        button.connect('clicked', lambda _b, action=action: (dialog.close(), action()))
+        whole.add_suffix(button)
+    storage.add(whole)
     page.add(storage)
 
     dialog.add(page)

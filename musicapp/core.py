@@ -697,7 +697,79 @@ class Core:
             self.worker.submit(job, done)
         self.ui.pick_folder(into)
 
+    # The whole library as one file: library.json and every file it refers to.
+    def export_library(self):
+        def chosen(target):
+            self.file.flush()
+            entries = [{'path': 'export.json', 'text': json.dumps({'format': importer.LIBRARY_FORMAT}, indent=2)},
+                       {'path': 'library.json', 'text': json.dumps(self.lib, ensure_ascii=False)}]
+            entries += [{'path': f'files/{name}', 'source': self.store.path(name)} for name in sorted(self.referenced_files()) if self.store.exists(name)]
+            self.status(T('exporting', 'Exporting…'))
+
+            def done(_result, error):
+                self.importing = None
+                self.status('')
+                if error:
+                    self.alert(T('exportFailed', 'Export failed'), str(error))
+                elif self.ui:
+                    self.ui.toast(T('exportedTo', 'Exported to “{name}”').replace('{name}', os.path.basename(target)))
+            self.worker.submit(lambda: importer.create_archive(target, entries, lambda done, total: self._progress(done, total, True)), done)
+        stamp = GLib.DateTime.new_now_local().format('%Y-%m-%d')
+        self.ui.save_file(f'{T("libraryExportName", "Music Library")} {stamp}.zip', chosen)
+
+    def import_library(self, path):
+        """Adds what is in the export and not here yet. Into an empty library, the settings come along too."""
+        lib = self.lib
+        empty = not lib['songs'] and not lib['playlists'] and not lib['folders']
+        known_songs, known_playlists = set(lib['songs']), {item['id'] for item in lib['playlists']}
+        self.status(T('importing', 'Importing…'))
+
+        def done(result, error):
+            self.importing = None
+            self.busy = ''
+            if error:
+                self.render()
+                invalid = isinstance(error, (ValueError, importer.zipfile.BadZipFile))
+                return self.alert(T('importFailed', 'Import failed'), T('libraryArchiveInvalid', 'That file is not a library export.') if invalid else str(error))
+            data, songs = result
+            lib['songs'].update(songs)
+            folders = {folder['id'] for folder in lib['folders']}
+            for folder in data.get('folders') or []:
+                if isinstance(folder, dict) and folder.get('id') and folder['id'] not in folders:
+                    lib['folders'].append(folder)
+            lists = 0
+            for item in data.get('playlists') or []:
+                if not isinstance(item, dict) or not item.get('id') or not isinstance(item.get('songIds'), list):
+                    continue
+                mine = self.playlist_of(item['id'])
+                if mine:   # the same playlist on both sides: what it lacks is added at the end
+                    mine['songIds'].extend(song_id for song_id in item['songIds'] if song_id in lib['songs'] and song_id not in mine['songIds'])
+                else:
+                    item['songIds'] = [song_id for song_id in item['songIds'] if song_id in lib['songs']]
+                    if item.get('coverFileId') and not self.store.exists(item['coverFileId']):
+                        item['coverFileId'] = ''
+                    lib['playlists'].append(item)
+                    lists += 1
+            lib['history'] = [*lib['history'], *[song_id for song_id in data.get('history') or [] if song_id in lib['songs'] and song_id not in lib['history']]][:60]
+            if empty:
+                for key in ('volume', 'shuffle', 'repeat', 'accent', 'fade', 'crossfade', 'appearance', 'language', 'topBar', 'subtitleSize', 'subtitlePlace', 'subtitleAt'):
+                    if key in data:
+                        lib[key] = data[key]
+                if data.get('defaultArtId') and self.store.exists(data['defaultArtId']):
+                    lib['defaultArtId'] = data['defaultArtId']
+                self.audio.set_volume(lib['volume'])
+            self.save()
+            self.render()
+            if self.ui:
+                if empty:
+                    self.ui.settings_changed()
+                self.ui.toast(T('libraryImported', 'Imported {songs} songs and {lists} playlists.').replace('{songs}', str(len(songs))).replace('{lists}', str(lists))
+                              if songs or lists else T('libraryNothingNew', 'Everything in that file is already in the library.'))
+        self.worker.submit(lambda: importer.read_library_archive(self.store, path, known_songs, known_playlists, empty, self._progress), done)
+
     def import_archive(self, path):
+        if importer.is_library_archive(path):
+            return self.import_library(path)
         self.status(T('importing', 'Importing…'))
 
         def done(entries, error):

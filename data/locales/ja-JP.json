@@ -198,5 +198,14 @@
   "notEnoughSpace": "移動先の空き容量が足りません。",
   "libraryInside": "現在のライブラリの外にあるフォルダを選んでください。",
   "libraryMissing": "ライブラリフォルダ“{name}”が見つかりません（ドライブは接続されていますか？）。当面は既定の場所のライブラリを使います。",
-  "libraryFolderName": "ミュージックライブラリ"
+  "libraryFolderName": "ミュージックライブラリ",
+  "exportLibrary": "ライブラリを書き出す…",
+  "importLibrary": "ライブラリを読み込む…",
+  "backup": "ライブラリ全体",
+  "backupHint": "曲、ビデオ、カバー、字幕、プレイリスト、フォルダのすべてを 1 つのファイルに。保管や別のコンピュータへの移行に使えます。読み込みでは、まだないものだけが追加されます。",
+  "libraryImported": "{songs} 曲と {lists} 個のプレイリストを読み込みました。",
+  "libraryNothingNew": "そのファイルの内容はすべてライブラリにあります。",
+  "libraryArchiveInvalid": "そのファイルはライブラリの書き出しではありません。",
+  "libraryExportName": "ミュージックライブラリ",
+  "export": "書き出す"
 }

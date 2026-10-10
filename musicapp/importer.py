@@ -340,6 +340,49 @@ def extract_archive(store, path, progress=None):
     return entries
 
 
+LIBRARY_FORMAT = 'music-library-export-v1'
+
+
+def is_library_archive(path):
+    try:
+        with zipfile.ZipFile(path) as archive:
+            return (manifest_of(archive.read('export.json').decode('utf-8', 'replace')) or {}).get('format') == LIBRARY_FORMAT
+    except (OSError, KeyError, zipfile.BadZipFile):
+        return False
+
+
+def read_library_archive(store, path, known_songs, known_playlists, adopt_settings, progress=None):
+    """A whole-library export: its library document, with the files of everything that is
+    not here yet (songs and playlists are told apart by their ids) copied into the store."""
+    with zipfile.ZipFile(path) as archive:
+        try:
+            marker = manifest_of(archive.read('export.json').decode('utf-8', 'replace')) or {}
+            data = manifest_of(archive.read('library.json').decode('utf-8', 'replace'))
+        except KeyError:
+            marker, data = {}, None
+        if marker.get('format') != LIBRARY_FORMAT or not isinstance(data, dict) or not isinstance(data.get('songs'), dict):
+            raise ValueError('not a library export')
+        inside = {os.path.basename(member.filename): member for member in archive.infolist()
+                  if not member.is_dir() and member.filename.startswith('files/') and member.filename.count('/') == 1}
+        songs = {song_id: song for song_id, song in data['songs'].items() if isinstance(song, dict) and song_id not in known_songs and song.get('fileId') in inside}
+        wanted = set()
+        for song in songs.values():
+            wanted.update((song.get('fileId'), song.get('artId')))
+            wanted.update(entry.get('fileId') for entry in song.get('subtitleFiles') or [] if isinstance(entry, dict))
+        wanted.update(item.get('coverFileId') for item in data.get('playlists') or [] if isinstance(item, dict) and item.get('id') not in known_playlists)
+        if adopt_settings:
+            wanted.add(data.get('defaultArtId'))
+        names = sorted(name for name in wanted if name and name in inside and not store.exists(name))
+        for index, name in enumerate(names):
+            if progress:
+                progress(index, len(names))
+            target = store.path(name)
+            with archive.open(inside[name]) as stream, open(target + '.part', 'wb') as output:
+                shutil.copyfileobj(stream, output)
+            os.replace(target + '.part', target)
+    return data, songs
+
+
 def create_archive(target, entries, progress=None):
     """entries: [{'path', 'text'} | {'path', 'source'}]. Audio is compressed already: stored as is."""
     temporary = target + '.part'
